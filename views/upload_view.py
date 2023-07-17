@@ -1,13 +1,13 @@
 # money-minder-server\views\upload_view.py
 
 import os
+import chardet
 import csv
 
 from flask import request, jsonify
 from werkzeug.utils import secure_filename
 
 from services import txn_service, bill_service
-
 
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'csv'}
@@ -58,18 +58,44 @@ def receive_wechat_bill():
 
 
 def _parse_alipay_bill(filename, bill_id):
-    with open(os.path.join(UPLOAD_FOLDER, filename), 'r', encoding='utf-8-sig') as csvfile:
-        csv_reader = csv.DictReader(csvfile)
-        for row in csv_reader:
+    file_path = os.path.join(UPLOAD_FOLDER, filename)
+
+    # 自动检测文件编码
+    with open(file_path, 'rb') as file:
+        result = chardet.detect(file.read())
+    encoding = result['encoding']
+
+    with open(file_path, 'r', encoding=encoding) as csvfile:
+        csv_reader = csv.reader(csvfile)
+
+        # 跳过前24行
+        for _ in range(24):
+            next(csv_reader)
+
+        # 处理第25行，获取所需字段的列索引
+        header = next(csv_reader)
+        col_indices = {
+            'txnDateTime': header.index('交易时间'),
+            'txnType': header.index('交易分类'),
+            'txnCpty': header.index('交易对方'),
+            'prodDesc': header.index('商品说明'),
+            'incOrExp': header.index('收/支'),
+            'txnAmount': header.index('金额'),
+            'payMethod': header.index('收/付款方式'),
+            'txnStatus': header.index('交易状态')
+        }
+
+        # 根据所需字段的列索引提取数据并插入Txn表
+        for line in csv_reader:
             txn_data = {
-                'txnDateTime': row['交易时间'],
-                'txnType': row['交易分类'],
-                'txnCpty': row['交易对方'],
-                'prodDesc': row['商品说明'],
-                'incOrExp': row['收/支'],
-                'txnAmount': row['金额'],
-                'payMethod': row['收/付款方式'],
-                'txnStatus': row['交易状态'],
+                'txnDateTime': line[col_indices['txnDateTime']],
+                'txnType': line[col_indices['txnType']],
+                'txnCpty': line[col_indices['txnCpty']],
+                'prodDesc': line[col_indices['prodDesc']],
+                'incOrExp': line[col_indices['incOrExp']],
+                'txnAmount': line[col_indices['txnAmount']],
+                'payMethod': line[col_indices['payMethod']],
+                'txnStatus': line[col_indices['txnStatus']],
                 'billId': bill_id
             }
             txn_service.add_txn(txn_data)

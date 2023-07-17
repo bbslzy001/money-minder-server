@@ -13,7 +13,7 @@ class Txn(db.Model):
     txn_amount = db.Column(db.Float)
     pay_method = db.Column(db.String(100))
     txn_status = db.Column(db.String(100))
-    bill_id = db.Column(db.Integer, db.ForeignKey('bill.billId', ondelete='CASCADE'))
+    bill_id = db.Column(db.Integer, db.ForeignKey('bill.bill_id', ondelete='CASCADE'))
 
     def __init__(self, txn_date_time, txn_type, txn_cpty, prod_desc, inc_or_exp, txn_amount, pay_method, txn_status, bill_id):
         self.txn_date_time = txn_date_time
