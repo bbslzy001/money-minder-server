@@ -19,7 +19,7 @@ def add_txn(data):
     db.session.add(new_txn)
     db.session.commit()
     txn_id = new_txn.txn_id  # 获取自增ID
-    return {'message': 'Transaction added successfully', 'txnId': txn_id}
+    return {'message': 'Transaction added successfully', 'id': txn_id}
 
 
 def delete_txn(txn_id):
@@ -64,4 +64,4 @@ def get_txns():
             'txnStatus': txn.txn_status,
             'billId': txn.bill_id
         })
-    return result
+    return {'message': 'Transaction gotten successfully', 'result': result}

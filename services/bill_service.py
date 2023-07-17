@@ -11,7 +11,7 @@ def add_bill(data):
     db.session.add(new_bill)
     db.session.commit()
     bill_id = new_bill.bill_id  # 获取自增ID
-    return {'message': 'Bill added successfully', 'billId': bill_id}
+    return {'message': 'Bill added successfully', 'id': bill_id}
 
 
 def delete_bill(bill_id):
@@ -40,4 +40,4 @@ def get_bills():
             'billId': bill.bill_id,
             'billName': bill.bill_name
         })
-    return result
+    return {'message': 'Bill gotten successfully', 'result': result}

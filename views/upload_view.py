@@ -4,6 +4,7 @@ import os
 import chardet
 import csv
 
+from datetime import datetime
 from flask import request, jsonify
 from werkzeug.utils import secure_filename
 
@@ -30,8 +31,8 @@ def receive_alipay_bill():
         filename = secure_filename(file.filename)
         file.save(os.path.join(UPLOAD_FOLDER, filename))
         result = bill_service.add_bill({'billName': filename})
-        if 'billId' in result:
-            bill_id = result['billId']
+        if 'id' in result:
+            bill_id = result['id']
             _parse_alipay_bill(filename, bill_id)
             return jsonify({'message': 'Alipay bill parsed successfully'}), 200
         else:
@@ -82,20 +83,54 @@ def _parse_alipay_bill(filename, bill_id):
             'incOrExp': header.index('收/支'),
             'txnAmount': header.index('金额'),
             'payMethod': header.index('收/付款方式'),
-            'txnStatus': header.index('交易状态')
+            'txnStatus': header.index('交易状态'),
+            'txnNumber': header.index('商家订单号')
         }
+
+        # 用于记录 incOrExp 为 "不计收支" 的 txnNumber
+        txn_numbers = {}
 
         # 根据所需字段的列索引提取数据并插入Txn表
         for line in csv_reader:
+            raw_txn_datetime = line[col_indices['txnDateTime']]
+            txn_type = line[col_indices['txnType']]
+            inc_or_exp = line[col_indices['incOrExp']]
+            txn_status = line[col_indices['txnStatus']]
+            pay_method = line[col_indices['payMethod']]
+            txn_number = line[col_indices['txnNumber']]
+
+            # 将 txnDateTime 转换为 datetime 对象
+            parsed_txn_datetime = datetime.strptime(raw_txn_datetime, '%Y/%m/%d %H:%M')
+            formatted_txn_datetime = parsed_txn_datetime.strftime('%Y/%m/%d %H:%M')
+
+            # 根据条件更新 txn_type 的值
+            if txn_type == '退款':
+                txn_type = '其他'
+
+            # 根据条件更新 inc_or_exp 和 txn_status 的值
+            if txn_number in txn_numbers:
+                if inc_or_exp != '不计收支':
+                    del txn_numbers[txn_number]
+                inc_or_exp = '不计'
+                if txn_status == '交易成功':
+                    txn_status = '交易关闭'
+            elif inc_or_exp == "不计收支":
+                inc_or_exp = "不计"
+                txn_numbers[txn_number] = True
+
+            # 根据条件更新 pay_method 的值
+            if pay_method == "":
+                pay_method = "/"
+
             txn_data = {
-                'txnDateTime': line[col_indices['txnDateTime']],
-                'txnType': line[col_indices['txnType']],
+                'txnDateTime': formatted_txn_datetime,
+                'txnType': txn_type,
                 'txnCpty': line[col_indices['txnCpty']],
                 'prodDesc': line[col_indices['prodDesc']],
-                'incOrExp': line[col_indices['incOrExp']],
+                'incOrExp': inc_or_exp,
                 'txnAmount': line[col_indices['txnAmount']],
-                'payMethod': line[col_indices['payMethod']],
-                'txnStatus': line[col_indices['txnStatus']],
+                'payMethod': pay_method,
+                'txnStatus': txn_status,
                 'billId': bill_id
             }
             txn_service.add_txn(txn_data)
