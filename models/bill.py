@@ -1,9 +1,6 @@
 # money-minder-server\models\bill.py
 
-from flask_sqlalchemy import SQLAlchemy
-
-
-db = SQLAlchemy()
+from . import db
 
 
 class Bill(db.Model):

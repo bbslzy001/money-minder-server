@@ -1,9 +1,6 @@
 # money-minder-server\models\txn.py
 
-from flask_sqlalchemy import SQLAlchemy
-
-
-db = SQLAlchemy()
+from . import db
 
 
 class Txn(db.Model):

@@ -1,48 +1,26 @@
 # money-minder-server\views\bill_view.py
 
-from flask import jsonify, request
-from models.bill import Bill, db
+from flask import request, jsonify
+from services import bill_service
 
 
-# 添加账单记录
-def add_bill():
+def add_bill_view():
     data = request.get_json()
-    new_bill = Bill(
-        billName=data['billName']
-    )
-    db.session.add(new_bill)
-    db.session.commit()
-    return jsonify({'message': 'Bill added successfully'})
+    result = bill_service.add_bill(data)
+    return jsonify(result)
 
 
-# 删除账单记录
 def delete_bill(bill_id):
-    bill = Bill.query.get(bill_id)
-    if not bill:
-        return jsonify({'error': 'Bill not found'})
-    db.session.delete(bill)
-    db.session.commit()
-    return jsonify({'message': 'Bill deleted successfully'})
+    result = bill_service.delete_bill(bill_id)
+    return jsonify(result)
 
 
-# 修改账单记录
 def update_bill(bill_id):
-    bill = Bill.query.get(bill_id)
-    if not bill:
-        return jsonify({'error': 'Bill not found'})
     data = request.get_json()
-    bill.billName = data.get('billName', bill.billName)
-    db.session.commit()
-    return jsonify({'message': 'Bill updated successfully'})
+    result = bill_service.update_bill(bill_id, data)
+    return jsonify(result)
 
 
-# 获取所有账单记录
 def get_bills():
-    bills = Bill.query.all()
-    result = []
-    for bill in bills:
-        result.append({
-            'billId': bill.billId,
-            'billName': bill.billName
-        })
+    result = bill_service.get_bills()
     return jsonify(result)
