@@ -5,6 +5,7 @@ from flask import Flask
 from flask_cors import CORS
 from models.txn import db
 from views.init import api_blueprint
+from views.upload_view import UPLOAD_FOLDER
 
 
 def create_app():
@@ -27,6 +28,10 @@ def create_app():
 
     # 注册蓝图
     app.register_blueprint(api_blueprint)
+
+    # 创建文件夹
+    if not os.path.exists(UPLOAD_FOLDER):
+        os.makedirs(UPLOAD_FOLDER)
 
     return app
 

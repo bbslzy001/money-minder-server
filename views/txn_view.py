@@ -8,7 +8,6 @@ from models.txn import Txn, db
 def add_txn():
     data = request.get_json()
     new_txn = Txn(
-        txnId=data['txnId'],
         txnDateTime=data['txnDateTime'],
         txnType=data['txnType'],
         txnCpty=data['txnCpty'],
@@ -16,7 +15,8 @@ def add_txn():
         incOrExp=data['incOrExp'],
         txnAmount=data['txnAmount'],
         payMethod=data['payMethod'],
-        txnStatus=data['txnStatus']
+        txnStatus=data['txnStatus'],
+        billId=data['billId']
     )
     db.session.add(new_txn)
     db.session.commit()
@@ -38,7 +38,6 @@ def update_txn(txn_id):
     txn = Txn.query.get(txn_id)
     if not txn:
         return jsonify({'error': 'Transaction not found'})
-
     data = request.get_json()
     txn.txnId = data.get('txnId', txn.txnId)
     txn.txnDateTime = data.get('txnDateTime', txn.txnDateTime)
@@ -49,7 +48,6 @@ def update_txn(txn_id):
     txn.txnAmount = data.get('txnAmount', txn.txnAmount)
     txn.payMethod = data.get('payMethod', txn.payMethod)
     txn.txnStatus = data.get('txnStatus', txn.txnStatus)
-
     db.session.commit()
     return jsonify({'message': 'Transaction updated successfully'})
 
