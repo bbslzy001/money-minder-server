@@ -1,4 +1,4 @@
-# money_minder_server\views\txn_view.py
+# money-minder-server\views\txn_view.py
 
 from flask import jsonify, request
 from models.txn import Txn, db

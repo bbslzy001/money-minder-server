@@ -1,4 +1,4 @@
-# money_minder_server\models\txn.py
+# money-minder-server\models\txn.py
 
 from flask_sqlalchemy import SQLAlchemy
 

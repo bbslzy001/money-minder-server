@@ -1,4 +1,4 @@
-# money_minder_server\app.py
+# money-minder-server\app.py
 
 import os
 from flask import Flask

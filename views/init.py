@@ -1,4 +1,4 @@
-# money_minder_server\views\init.py
+# money-minder-server\views\init.py
 
 from flask import Blueprint
 from views.txn_view import add_txn, delete_txn, update_txn, get_txns

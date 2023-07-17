@@ -1,4 +1,4 @@
-# money_minder_server\settings\production.py
+# money-minder-server\settings\production.py
 
 DEBUG = False  # 关闭调试模式
 ENABLE_CORS = False  # 不允许跨域

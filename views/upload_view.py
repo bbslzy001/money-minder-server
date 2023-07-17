@@ -1,4 +1,4 @@
-# money_minder_server\views\upload_view.py
+# money-minder-server\views\upload_view.py
 
 from flask import request, jsonify
 from werkzeug.utils import secure_filename

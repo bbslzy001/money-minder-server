@@ -1,4 +1,4 @@
-# money_minder_server\settings\development.py
+# money-minder-server\settings\development.py
 
 DEBUG = True  # 开启调试模式
 ENABLE_CORS = True  # 允许跨域
