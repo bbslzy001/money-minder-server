@@ -1,11 +1,11 @@
 # money-minder-server\models\bill.py
 
-from . import db
+from models import db
 
 
 class Bill(db.Model):
-    billId = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    billName = db.Column(db.String(100))
+    bill_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    bill_name = db.Column(db.String(100))
 
-    def __init__(self, billName):
-        self.billName = billName
+    def __init__(self, bill_name):
+        self.bill_name = bill_name

@@ -1,6 +1,7 @@
 # money-minder-server\views\__init__.py
 
 from flask import Blueprint
+
 from views import txn_view, upload_view
 
 

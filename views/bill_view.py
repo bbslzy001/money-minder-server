@@ -1,10 +1,11 @@
 # money-minder-server\views\bill_view.py
 
 from flask import request, jsonify
+
 from services import bill_service
 
 
-def add_bill_view():
+def add_bill():
     data = request.get_json()
     result = bill_service.add_bill(data)
     return jsonify(result)

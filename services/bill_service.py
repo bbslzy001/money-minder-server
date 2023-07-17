@@ -6,11 +6,11 @@ from models.bill import Bill
 
 def add_bill(data):
     new_bill = Bill(
-        billName=data['billName']
+        bill_name=data['billName']
     )
     db.session.add(new_bill)
     db.session.commit()
-    bill_id = new_bill.billId  # 获取自增ID
+    bill_id = new_bill.bill_id  # 获取自增ID
     return {'message': 'Bill added successfully', 'billId': bill_id}
 
 
@@ -27,7 +27,7 @@ def update_bill(bill_id, data):
     bill = Bill.query.get(bill_id)
     if not bill:
         return {'error': 'Bill not found'}
-    bill.billName = data.get('billName', bill.billName)
+    bill.bill_name = data.get('billName', bill.bill_name)
     db.session.commit()
     return {'message': 'Bill updated successfully'}
 
@@ -37,7 +37,7 @@ def get_bills():
     result = []
     for bill in bills:
         result.append({
-            'billId': bill.billId,
-            'billName': bill.billName
+            'billId': bill.bill_id,
+            'billName': bill.bill_name
         })
     return result
