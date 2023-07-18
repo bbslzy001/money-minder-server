@@ -83,7 +83,6 @@ def _parse_alipay_bill(filename, bill_id):
 
             # 处理第25行，获取所需字段的列索引
             header = next(csv_reader)
-            print(header)
             col_indices = {
                 'txnDateTime': header.index('交易时间'),
                 'txnType': header.index('交易分类'),

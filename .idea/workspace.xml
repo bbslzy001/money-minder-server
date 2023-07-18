@@ -4,12 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e7292397-da1b-470f-8a82-138663aeee30" name="更改" comment="update parse upload-file.">
+    <list default="true" id="e7292397-da1b-470f-8a82-138663aeee30" name="更改" comment="fix delete bill error.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/bill.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/bill.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/txn.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/txn.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/views/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/views/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/upload_view.py" beforeDir="false" afterPath="$PROJECT_DIR$/views/upload_view.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -124,6 +121,7 @@
       <workItem from="1689676076916" duration="862000" />
       <workItem from="1689676952358" duration="190000" />
       <workItem from="1689677196652" duration="928000" />
+      <workItem from="1689678144888" duration="709000" />
     </task>
     <task id="LOCAL-00001" summary="Standardized the code.">
       <option name="closed" value="true" />
@@ -165,7 +163,15 @@
       <option name="project" value="LOCAL" />
       <updated>1689611465154</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="fix delete bill error.">
+      <option name="closed" value="true" />
+      <created>1689678202589</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1689678202589</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -175,10 +181,11 @@
     <MESSAGE value="Standardized the code." />
     <MESSAGE value="finish upload." />
     <MESSAGE value="update parse upload-file." />
-    <option name="LAST_COMMIT_MESSAGE" value="update parse upload-file." />
+    <MESSAGE value="fix delete bill error." />
+    <option name="LAST_COMMIT_MESSAGE" value="fix delete bill error." />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/money_minder_server$money_minder_server.coverage" NAME="money-minder-server 覆盖结果" MODIFIED="1689678056354" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/money_minder_server$money_minder_server.coverage" NAME="money-minder-server 覆盖结果" MODIFIED="1689678211938" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/money_minder_server$run.coverage" NAME="run 覆盖结果" MODIFIED="1689591841321" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
