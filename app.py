@@ -24,6 +24,7 @@ def create_app():
 
     # 初始化数据库
     db.init_app(app)
+
     # 激活应用上下文并创建数据库表
     with app.app_context():
         db.create_all()
