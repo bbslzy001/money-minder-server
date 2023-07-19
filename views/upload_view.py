@@ -113,14 +113,17 @@ def _add_alipay_txn(bill_id, csv_reader):
         for line in csv_reader:
             txn_datetime = line[col_indices['txnDateTime']]
             txn_type = line[col_indices['txnType']]
+            txn_cpty = line[col_indices['txnCpty']]
+            prod_desc = line[col_indices['prodDesc']]
             inc_or_exp = line[col_indices['incOrExp']]
-            txn_status = line[col_indices['txnStatus']]
+            txn_amount = line[col_indices['txnAmount']]
             pay_method = line[col_indices['payMethod']]
+            txn_status = line[col_indices['txnStatus']]
             txn_number = line[col_indices['txnNumber']].strip()  # 去除 txn_number 两侧的空格
 
             # 将 txnDateTime 转换为 datetime 对象
             parsed_txn_datetime = datetime.strptime(txn_datetime, '%Y-%m-%d %H:%M:%S')
-            formatted_txn_datetime = parsed_txn_datetime.strftime('%Y-%m-%d %H:%M:%S')
+            txn_datetime = parsed_txn_datetime.strftime('%Y-%m-%d %H:%M:%S')
 
             # 根据条件更新 txn_type 的值
             if txn_type == '退款':
@@ -142,12 +145,12 @@ def _add_alipay_txn(bill_id, csv_reader):
                 pay_method = "/"
 
             txn_data = {
-                'txnDateTime': formatted_txn_datetime,
+                'txnDateTime': txn_datetime,
                 'txnType': txn_type,
-                'txnCpty': line[col_indices['txnCpty']],
-                'prodDesc': line[col_indices['prodDesc']],
+                'txnCpty': txn_cpty,
+                'prodDesc': prod_desc,
                 'incOrExp': inc_or_exp,
-                'txnAmount': line[col_indices['txnAmount']],
+                'txnAmount': txn_amount,
                 'payMethod': pay_method,
                 'txnStatus': txn_status,
                 'billId': bill_id
@@ -163,11 +166,99 @@ def _add_alipay_txn(bill_id, csv_reader):
 
 
 def _add_wechat_bill(filename, csv_reader):
-    pass
+    result = None
+    try:
+        # 跳过前2行
+        for _ in range(2):
+            next(csv_reader)
+
+        # 处理第3行，获取账单的起止日期
+        bill_date = next(csv_reader)[0]
+        start_date = datetime.strptime(bill_date[bill_date.index('[') + 1: bill_date.index(']')], '%Y-%m-%d %H:%M:%S')
+        end_date = datetime.strptime(bill_date[bill_date.rindex('[') + 1: bill_date.rindex(']')], '%Y-%m-%d %H:%M:%S')
+        bill_data = {
+            'billName': filename,
+            'startDate': start_date.strftime('%Y-%m-%d'),
+            'endDate': end_date.strftime('%Y-%m-%d'),
+            'billType': 'wechat'
+        }
+
+        # 跳过第4-16行，共13行
+        for _ in range(13):
+            next(csv_reader)  # 引用传递
+
+        result = bill_service.add_bill(bill_data)
+
+        return result['id']
+    except Exception as e:
+        print(e)
+        if result:
+            bill_service.delete_bill(result['id'])  # 失败时自动删除该账单及所有已添加的交易记录
+        return 0
 
 
 def _add_wechat_txn(bill_id, csv_reader):
-    pass
+    try:
+        # 处理第17行，获取所需字段的列索引
+        header = next(csv_reader)
+        col_indices = {
+            'txnDateTime': header.index('交易时间'),
+            'txnType': header.index('交易类型'),
+            'txnCpty': header.index('交易对方'),
+            'prodDesc': header.index('商品'),
+            'incOrExp': header.index('收/支'),
+            'txnAmount': header.index('金额(元)'),
+            'payMethod': header.index('支付方式'),
+            'txnStatus': header.index('当前状态')
+        }
+
+        # 根据所需字段的列索引提取数据并插入Txn表
+        for line in csv_reader:
+            txn_datetime = line[col_indices['txnDateTime']]
+            txn_type = line[col_indices['txnType']]
+            txn_cpty = line[col_indices['txnCpty']]
+            prod_desc = line[col_indices['prodDesc']]
+            inc_or_exp = line[col_indices['incOrExp']]
+            txn_amount = line[col_indices['txnAmount']]
+            pay_method = line[col_indices['payMethod']]
+            txn_status = line[col_indices['txnStatus']]
+
+            # 将 txnDateTime 转换为 datetime 对象
+            parsed_txn_datetime = datetime.strptime(txn_datetime, '%Y-%m-%d %H:%M:%S')
+            txn_datetime = parsed_txn_datetime.strftime('%Y-%m-%d %H:%M:%S')
+
+            txn_type = '其他'
+
+            txn_amount = txn_amount[1:]
+
+            if txn_status in ('对方已收钱', '已存入零钱', '已到账', '已转账', '支付成功'):
+                txn_status = '交易成功'
+            elif txn_status in ('对方已退还', '已全额退款'):
+                if inc_or_exp == '收入':
+                    txn_status = '退款成功'
+                elif inc_or_exp == '支出':
+                    txn_status = '交易关闭'
+                inc_or_exp = '不计'
+
+            txn_data = {
+                'txnDateTime': txn_datetime,
+                'txnType': txn_type,
+                'txnCpty': txn_cpty,
+                'prodDesc': prod_desc,
+                'incOrExp': inc_or_exp,
+                'txnAmount': txn_amount,
+                'payMethod': pay_method,
+                'txnStatus': txn_status,
+                'billId': bill_id
+            }
+
+            txn_service.add_txn(txn_data)
+
+        return True
+    except Exception as e:
+        print(e)
+        bill_service.delete_bill(bill_id)
+        return False
 
 
 def detect_encoding(file_path):
