@@ -15,5 +15,4 @@ api_blueprint.route('/bill/delete/<int:bill_id>', methods=['DELETE'])(bill_view.
 api_blueprint.route('/bill/update/<int:bill_id>', methods=['PUT'])(bill_view.update_bill)
 api_blueprint.route('/bill/getall', methods=['GET'])(bill_view.get_bills)
 
-api_blueprint.route('/upload/alipay', methods=['POST'])(upload_view.receive_alipay_bill)
-api_blueprint.route('/upload/wechat', methods=['POST'])(upload_view.receive_wechat_bill)
+api_blueprint.route('/upload/<string:bill_type>', methods=['POST'])(upload_view.receive_bill)
