@@ -2,7 +2,7 @@
 
 from flask import Blueprint
 
-from views import txn_view, bill_view, upload_view
+from views import txn_view, bill_view, upload_view, txn_type_view, rule_view
 
 
 api_blueprint = Blueprint('api', __name__, url_prefix='/api')
@@ -16,3 +16,13 @@ api_blueprint.route('/bill/update/<int:bill_id>', methods=['PUT'])(bill_view.upd
 api_blueprint.route('/bill/getall', methods=['GET'])(bill_view.get_bills)
 
 api_blueprint.route('/upload/<string:bill_type>', methods=['POST'])(upload_view.receive_bill)
+
+api_blueprint.route('/txn-type/add', methods=['POST'])(txn_type_view.add_txn_type)
+api_blueprint.route('/txn-type/delete/<int:txn_type_id>', methods=['DELETE'])(txn_type_view.delete_txn_type)
+api_blueprint.route('/txn-type/update/<int:txn_type_id>', methods=['PUT'])(txn_type_view.update_txn_type)
+api_blueprint.route('/txn-type/getall', methods=['GET'])(txn_type_view.get_txn_types)
+
+api_blueprint.route('/rule/add', methods=['POST'])(rule_view.add_rule)
+api_blueprint.route('/rule/delete/<int:rule_id>', methods=['DELETE'])(rule_view.delete_rule)
+api_blueprint.route('/rule/update/<int:rule_id>', methods=['PUT'])(rule_view.update_rule)
+api_blueprint.route('/rule/getall', methods=['GET'])(rule_view.get_rules)

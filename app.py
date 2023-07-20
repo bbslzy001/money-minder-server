@@ -6,6 +6,7 @@ from flask import Flask
 from flask_cors import CORS
 # from waitress import serve
 
+import models  # 显式导入models模块，以便SQLAlchemy能够初始化所有模型
 from models import db
 from views import api_blueprint, upload_view
 
