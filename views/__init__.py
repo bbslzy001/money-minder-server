@@ -2,7 +2,7 @@
 
 from flask import Blueprint
 
-from views import txn_view, bill_view, upload_view, txn_type_view, rule_view
+from views import bill_view, config_view, rule_view, txn_type_view, txn_view, upload_view
 
 
 api_blueprint = Blueprint('api', __name__, url_prefix='/api')
@@ -26,3 +26,10 @@ api_blueprint.route('/rule/add', methods=['POST'])(rule_view.add_rule)
 api_blueprint.route('/rule/delete/<int:rule_id>', methods=['DELETE'])(rule_view.delete_rule)
 api_blueprint.route('/rule/update/<int:rule_id>', methods=['PUT'])(rule_view.update_rule)
 api_blueprint.route('/rule/getall', methods=['GET'])(rule_view.get_rules)
+
+api_blueprint.route('/rule/add/apply-txns', methods=['POST'])(rule_view.add_rule_apply_txns)
+api_blueprint.route('/rule/delete/apply-txns/<int:rule_id>', methods=['DELETE'])(rule_view.delete_rule_apply_txns)
+api_blueprint.route('/rule/update/apply-txns/<int:rule_id>', methods=['PUT'])(rule_view.update_rule_apply_txns)
+
+api_blueprint.route('/config/update/<int:config_id>', methods=['PUT'])(config_view.update_config)
+api_blueprint.route('/config/get/<int:config_id>', methods=['GET'])(config_view.get_config)

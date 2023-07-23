@@ -9,7 +9,7 @@ def add_bill(data):
         bill_name=data['billName'],
         start_date=data['startDate'],
         end_date=data['endDate'],
-        bill_type=data['billType']
+        bill_type=data['billType'],
     )
     db.session.add(new_bill)
     db.session.commit()
@@ -47,6 +47,6 @@ def get_bills():
             'billName': bill.bill_name,
             'startDate': bill.start_date,
             'endDate': bill.end_date,
-            'billType': bill.bill_type
+            'billType': bill.bill_type,
         })
     return {'message': 'Bill gotten successfully', 'result': result}

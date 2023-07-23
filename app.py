@@ -8,6 +8,8 @@ from flask_cors import CORS
 
 import models  # 显式导入models模块，以便SQLAlchemy能够初始化所有模型
 from models import db
+from models.config import Config
+from models.txn_type import TxnType
 from views import api_blueprint, upload_view
 
 
@@ -29,6 +31,9 @@ def create_app():
     # 激活应用上下文并创建数据库表
     with app.app_context():
         db.create_all()
+        # 在数据库中插入初始数据
+        Config.insert_initial_data()
+        TxnType.insert_initial_data()
 
     # 注册蓝图
     app.register_blueprint(api_blueprint)

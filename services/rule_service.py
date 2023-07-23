@@ -9,7 +9,7 @@ def add_rule(data):
         origin_txn_type=data['originTxnType'],
         txn_cpty=data['txnCpty'],
         prod_desc=data['prodDesc'],
-        txn_type_id=data['txnTypeId']
+        txn_type_id=data['txnTypeId'],
     )
     db.session.add(new_rule)
     db.session.commit()
@@ -38,6 +38,20 @@ def update_rule(rule_id, data):
     return {'message': 'Rule updated successfully'}
 
 
+def get_rule(rule_id):
+    rule = Rule.query.get(rule_id)
+    if not rule:
+        return {'error': 'Rule not found'}
+    result = {
+        'ruleId': rule.rule_id,
+        'originTxnType': rule.origin_txn_type,
+        'txnCpty': rule.txn_cpty,
+        'prodDesc': rule.prod_desc,
+        'txnTypeId': rule.txn_type_id,
+    }
+    return {'message': 'Rule gotten successfully', 'result': result}
+
+
 def get_rules():
     rules = Rule.query.all()
     result = []
@@ -47,6 +61,6 @@ def get_rules():
             'originTxnType': rule.origin_txn_type,
             'txnCpty': rule.txn_cpty,
             'prodDesc': rule.prod_desc,
-            'txnTypeId': rule.txn_type_id
+            'txnTypeId': rule.txn_type_id,
         })
     return {'message': 'Rule gotten successfully', 'result': result}

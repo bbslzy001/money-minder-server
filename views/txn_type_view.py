@@ -1,6 +1,6 @@
 # money-minder-server\views\txn_type_view.py
 
-from flask import request, jsonify
+from flask import jsonify, request
 
 from services import txn_type_service
 

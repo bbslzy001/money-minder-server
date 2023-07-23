@@ -12,6 +12,8 @@ class Rule(db.Model):
     prod_desc = db.Column(db.String(100))
     txn_type_id = db.Column(db.Integer, db.ForeignKey('txn_type.txn_type_id'))
 
+    # txns = db.relationship("Txn", cascade="all, delete, delete-orphan")  # 不操作 / 将对应的Txn中的rule_id字段变更为1
+
     def __init__(self, origin_txn_type, txn_cpty, prod_desc, txn_type_id):
         self.origin_txn_type = origin_txn_type
         self.txn_cpty = txn_cpty

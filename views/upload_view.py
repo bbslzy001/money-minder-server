@@ -5,10 +5,10 @@ import chardet
 import csv
 
 from datetime import datetime
-from flask import request, jsonify
+from flask import jsonify, request
 from werkzeug.utils import secure_filename
 
-from services import txn_service, bill_service
+from services import bill_service, rule_service, txn_type_service, txn_service
 
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'csv'}
@@ -73,7 +73,7 @@ def _add_alipay_bill(filename, csv_reader):
             'billName': filename,
             'startDate': start_date.strftime('%Y-%m-%d'),
             'endDate': end_date.strftime('%Y-%m-%d'),
-            'billType': 'alipay'
+            'billType': 'alipay',
         }
 
         # 跳过第6-24行，共19行
@@ -96,38 +96,53 @@ def _add_alipay_txn(bill_id, csv_reader):
         header = next(csv_reader)
         col_indices = {
             'txnDateTime': header.index('交易时间'),
-            'txnType': header.index('交易分类'),
             'txnCpty': header.index('交易对方'),
             'prodDesc': header.index('商品说明'),
             'incOrExp': header.index('收/支'),
             'txnAmount': header.index('金额'),
             'payMethod': header.index('收/付款方式'),
             'txnStatus': header.index('交易状态'),
-            'txnNumber': header.index('商家订单号')
+            'originTxnType': header.index('交易分类'),
+            'txnNumber': header.index('商家订单号'),
         }
 
         # 用于记录 incOrExp 为 "不计收支" 的 txnNumber
         txn_numbers = {}
 
+        # 查询匹配规则和交易类型
+        rules = rule_service.get_rules()['result']
+        txn_types = txn_type_service.get_txn_types()['result']
+
         # 根据所需字段的列索引提取数据并插入Txn表
         for line in csv_reader:
             txn_datetime = line[col_indices['txnDateTime']]
-            txn_type = line[col_indices['txnType']]
             txn_cpty = line[col_indices['txnCpty']]
             prod_desc = line[col_indices['prodDesc']]
             inc_or_exp = line[col_indices['incOrExp']]
             txn_amount = line[col_indices['txnAmount']]
             pay_method = line[col_indices['payMethod']]
             txn_status = line[col_indices['txnStatus']]
+            origin_txn_type = line[col_indices['originTxnType']]
             txn_number = line[col_indices['txnNumber']].strip()  # 去除 txn_number 两侧的空格
+
+            # 默认为其他且未应用规则
+            txn_type_id = 1
+            rule_id = None
 
             # 将 txnDateTime 转换为 datetime 对象
             parsed_txn_datetime = datetime.strptime(txn_datetime, '%Y-%m-%d %H:%M:%S')
             txn_datetime = parsed_txn_datetime.strftime('%Y-%m-%d %H:%M:%S')
 
             # 根据条件更新 txn_type 的值
-            if txn_type == '退款':
-                txn_type = '其他'
+            for rule in rules:
+                if (rule['originTxnType'] == '/' or rule['originTxnType'] == origin_txn_type) and \
+                        (rule['txnCpty'] == '/' or rule['txnCpty'] == txn_cpty) and \
+                        (rule['prodDesc'] == '/' or rule['prodDesc'] == prod_desc):
+                    txn_type_id = rule['txnTypeId']
+                    rule_id = rule['ruleId']
+                    break
+            if rule_id is None:
+                txn_type_id = next((t['txnTypeId'] for t in txn_types if t['txnTypeName'] == origin_txn_type), txn_type_id)
 
             # 根据条件更新 inc_or_exp 和 txn_status 的值
             if txn_number in txn_numbers:
@@ -146,14 +161,16 @@ def _add_alipay_txn(bill_id, csv_reader):
 
             txn_data = {
                 'txnDateTime': txn_datetime,
-                'txnType': txn_type,
                 'txnCpty': txn_cpty,
                 'prodDesc': prod_desc,
                 'incOrExp': inc_or_exp,
                 'txnAmount': txn_amount,
                 'payMethod': pay_method,
                 'txnStatus': txn_status,
-                'billId': bill_id
+                'originTxnType': origin_txn_type,
+                'txnTypeId': txn_type_id,
+                'ruleId': rule_id,
+                'billId': bill_id,
             }
 
             txn_service.add_txn(txn_data)
@@ -180,7 +197,7 @@ def _add_wechat_bill(filename, csv_reader):
             'billName': filename,
             'startDate': start_date.strftime('%Y-%m-%d'),
             'endDate': end_date.strftime('%Y-%m-%d'),
-            'billType': 'wechat'
+            'billType': 'wechat',
         }
 
         # 跳过第4-16行，共13行
@@ -203,31 +220,48 @@ def _add_wechat_txn(bill_id, csv_reader):
         header = next(csv_reader)
         col_indices = {
             'txnDateTime': header.index('交易时间'),
-            'txnType': header.index('交易类型'),
             'txnCpty': header.index('交易对方'),
             'prodDesc': header.index('商品'),
             'incOrExp': header.index('收/支'),
             'txnAmount': header.index('金额(元)'),
             'payMethod': header.index('支付方式'),
-            'txnStatus': header.index('当前状态')
+            'txnStatus': header.index('当前状态'),
+            'originTxnType': header.index('交易类型'),
         }
+
+        # 查询匹配规则和交易类型
+        rules = rule_service.get_rules()['result']
+        txn_types = txn_type_service.get_txn_types()['result']
 
         # 根据所需字段的列索引提取数据并插入Txn表
         for line in csv_reader:
             txn_datetime = line[col_indices['txnDateTime']]
-            txn_type = line[col_indices['txnType']]
             txn_cpty = line[col_indices['txnCpty']]
             prod_desc = line[col_indices['prodDesc']]
             inc_or_exp = line[col_indices['incOrExp']]
             txn_amount = line[col_indices['txnAmount']]
             pay_method = line[col_indices['payMethod']]
             txn_status = line[col_indices['txnStatus']]
+            origin_txn_type = line[col_indices['originTxnType']]
+
+            # 默认为其他且未应用规则
+            txn_type_id = 1
+            rule_id = None
 
             # 将 txnDateTime 转换为 datetime 对象
             parsed_txn_datetime = datetime.strptime(txn_datetime, '%Y-%m-%d %H:%M:%S')
             txn_datetime = parsed_txn_datetime.strftime('%Y-%m-%d %H:%M:%S')
 
-            txn_type = '其他'
+            # 根据条件更新 txn_type 的值
+            for rule in rules:
+                if (rule['originTxnType'] == '/' or rule['originTxnType'] == origin_txn_type) and \
+                        (rule['txnCpty'] == '/' or rule['txnCpty'] == txn_cpty) and \
+                        (rule['prodDesc'] == '/' or rule['prodDesc'] == prod_desc):
+                    txn_type_id = rule['txnTypeId']
+                    rule_id = rule['ruleId']
+                    break
+            if rule_id is None:
+                txn_type_id = next((t['txnTypeId'] for t in txn_types if t['txnTypeName'] == origin_txn_type), txn_type_id)
 
             txn_amount = txn_amount[1:]
 
@@ -242,14 +276,16 @@ def _add_wechat_txn(bill_id, csv_reader):
 
             txn_data = {
                 'txnDateTime': txn_datetime,
-                'txnType': txn_type,
                 'txnCpty': txn_cpty,
                 'prodDesc': prod_desc,
                 'incOrExp': inc_or_exp,
                 'txnAmount': txn_amount,
                 'payMethod': pay_method,
                 'txnStatus': txn_status,
-                'billId': bill_id
+                'originTxnType': origin_txn_type,
+                'txnTypeId': txn_type_id,
+                'ruleId': rule_id,
+                'billId': bill_id,
             }
 
             txn_service.add_txn(txn_data)
