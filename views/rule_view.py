@@ -39,7 +39,7 @@ def update_rule_apply_txns(rule_id):
     data = request.get_json()
     original_rule = rule_service.get_rule(rule_id)
     rule_service.update_rule(rule_id, data)
-    result = txn_service.update_txns_by_updated_rule(rule_id, original_rule, data)
+    result = txn_service.update_txns_by_updated_rule(rule_id, original_rule['result'], data)
     return jsonify(result)
 
 
