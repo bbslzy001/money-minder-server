@@ -54,13 +54,11 @@ def get_rule(rule_id):
 
 def get_rules():
     rules = Rule.query.all()
-    result = []
-    for rule in rules:
-        result.append({
-            'ruleId': rule.rule_id,
-            'originTxnType': rule.origin_txn_type,
-            'txnCpty': rule.txn_cpty,
-            'prodDesc': rule.prod_desc,
-            'txnTypeId': rule.txn_type_id,
-        })
+    result = [{
+        'ruleId': rule.rule_id,
+        'originTxnType': rule.origin_txn_type,
+        'txnCpty': rule.txn_cpty,
+        'prodDesc': rule.prod_desc,
+        'txnTypeId': rule.txn_type_id,
+    } for rule in rules]
     return {'message': 'Rule gotten successfully', 'result': result}

@@ -40,13 +40,11 @@ def update_bill(bill_id, data):
 
 def get_bills():
     bills = Bill.query.all()
-    result = []
-    for bill in bills:
-        result.append({
-            'billId': bill.bill_id,
-            'billName': bill.bill_name,
-            'startDate': bill.start_date,
-            'endDate': bill.end_date,
-            'billType': bill.bill_type,
-        })
+    result = [{
+        'billId': bill.bill_id,
+        'billName': bill.bill_name,
+        'startDate': bill.start_date,
+        'endDate': bill.end_date,
+        'billType': bill.bill_type,
+    } for bill in bills]
     return {'message': 'Bill gotten successfully', 'result': result}

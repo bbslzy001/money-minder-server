@@ -48,11 +48,9 @@ def get_config(config_id):
 
 def get_configs():
     configs = Config.query.all()
-    result = []
-    for config in configs:
-        result.append({
-            'configId': config.config_id,
-            'configName': config.config_name,
-            'configValue': config.config_value,
-        })
+    result = [{
+        'configId': config.config_id,
+        'configName': config.config_name,
+        'configValue': config.config_value,
+    } for config in configs]
     return {'message': 'Config gotten successfully', 'result': result}

@@ -38,10 +38,8 @@ def update_txn_type(txn_type_id, data):
 
 def get_txn_types():
     txn_types = TxnType.query.all()
-    result = []
-    for txn_type in txn_types:
-        result.append({
-            'txnTypeId': txn_type.txn_type_id,
-            'txnTypeName': txn_type.txn_type_name,
-        })
+    result = [{
+        'txnTypeId': txn_type.txn_type_id,
+        'txnTypeName': txn_type.txn_type_name,
+    } for txn_type in txn_types]
     return {'message': 'TxnType gotten successfully', 'result': result}
