@@ -150,7 +150,7 @@ def get_txns_by_amount_rank(start_date, end_date, inc_or_exp):
     ]
     txns = Txn.query.filter(*filters).order_by(Txn.txn_amount.desc()).limit(5).all()
     result = [{
-        'prodDesc': txn.prod_desc,
+        'txnCpty': txn.txn_cpty,
         'txnAmount': txn.txn_amount,
     } for txn in txns]
     return {'message': 'Transactions ranked successfully', 'result': result}
@@ -192,7 +192,7 @@ def get_count_by_time(start_date, end_date, inc_or_exp):
         ]
         count = Txn.query.filter(*filters).count()
         result.append({
-            'timeRange': f"{start_hour}:00:00-{end_hour-1}:59:59",
+            'timeRange': f"{start_hour}时-{end_hour}时",
             'txnCount': count,
         })
     return {'message': 'Transaction count by time calculated successfully', 'result': result}
