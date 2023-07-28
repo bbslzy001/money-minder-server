@@ -198,6 +198,25 @@ def get_count_by_time(start_date, end_date, inc_or_exp):
     return {'message': 'Transaction count by time calculated successfully', 'result': result}
 
 
+# 获取每日的收入/支出总金额
+# 返回值：日期，金额
+def get_amount_by_date(start_date, end_date, inc_or_exp):
+    entities = [
+        func.strftime('%Y-%m-%d', Txn.txn_date_time),
+        func.sum(Txn.txn_amount),
+    ]
+    filters = [
+        Txn.txn_date_time.between(start_date, end_date),
+        Txn.inc_or_exp == inc_or_exp,
+    ]
+    amount_by_date = Txn.query.with_entities(*entities).filter(*filters).group_by(func.strftime('%Y-%m-%d', Txn.txn_date_time)).all()
+    result = [{
+        'txnDate': item[0],
+        'txnAmount': item[1],
+    } for item in amount_by_date]
+    return {'message': 'Transaction amount by date calculated successfully', 'result': result}
+
+
 def get_txns():
     txns = Txn.query.all()
     result = [{
