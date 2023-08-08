@@ -40,3 +40,4 @@ api_blueprint.route('/analysis/txns-by-amount-rank', methods=['POST'])(analysis_
 api_blueprint.route('/analysis/amount-by-type', methods=['POST'])(analysis_view.get_amount_by_type)
 api_blueprint.route('/analysis/count-by-time', methods=['POST'])(analysis_view.get_count_by_time)
 api_blueprint.route('/analysis/amount-by-date', methods=['POST'])(analysis_view.get_amount_by_date)
+api_blueprint.route('/analysis/amount-by-calendar', methods=['POST'])(analysis_view.get_amount_by_calendar)

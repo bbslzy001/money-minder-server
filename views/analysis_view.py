@@ -39,3 +39,9 @@ def get_amount_by_date():
     data = request.get_json()
     result = txn_service.get_amount_by_date(data['startDate'], data['endDate'], data['incOrExp'])
     return jsonify(result)
+
+
+def get_amount_by_calendar():
+    data = request.get_json()
+    result = txn_service.get_amount_by_calendar(data['startDate'], data['endDate'], data['incOrExp'])
+    return jsonify(result)
