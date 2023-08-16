@@ -129,7 +129,7 @@ def get_count(start_date, end_date):
 # 获取收入/支出总金额
 def get_amount(start_date, end_date, inc_or_exp):
     entities = [
-        func.sum(Txn.txn_amount),
+        func.round(func.sum(Txn.txn_amount), 2),
     ]
     filters = [
         Txn.txn_date_time.between(start_date, end_date),
@@ -160,7 +160,7 @@ def get_txns_by_amount_rank(start_date, end_date, inc_or_exp):
 def get_amount_by_type(start_date, end_date, inc_or_exp):
     entities = [
         Txn.txn_type_id,
-        func.sum(Txn.txn_amount),
+        func.round(func.sum(Txn.txn_amount), 2),
     ]
     filters = [
         Txn.txn_date_time.between(start_date, end_date),
@@ -203,7 +203,7 @@ def get_count_by_time(start_date, end_date, inc_or_exp):
 def get_amount_by_date(start_date, end_date, inc_or_exp):
     entities = [
         func.strftime('%Y-%m-%d', Txn.txn_date_time),
-        func.sum(Txn.txn_amount),
+        func.round(func.sum(Txn.txn_amount), 2),
     ]
     filters = [
         Txn.txn_date_time.between(start_date, end_date),
@@ -215,25 +215,6 @@ def get_amount_by_date(start_date, end_date, inc_or_exp):
         'txnAmount': item[1],
     } for item in amount_by_date]
     return {'message': 'Transaction amount by date calculated successfully', 'result': result}
-
-
-# 获取每日的收入/支出总金额
-# 返回值：日期，金额
-def get_amount_by_calendar(start_date, end_date, inc_or_exp):
-    entities = [
-        func.strftime('%Y-%m-%d', Txn.txn_date_time),
-        func.sum(Txn.txn_amount),
-    ]
-    filters = [
-        Txn.txn_date_time.between(start_date, end_date),
-        Txn.inc_or_exp == inc_or_exp,
-    ]
-    amount_by_calendar = Txn.query.with_entities(*entities).filter(*filters).group_by(func.strftime('%Y-%m-%d', Txn.txn_date_time)).all()
-    result = [{
-        'txnDate': item[0],
-        'txnAmount': item[1],
-    } for item in amount_by_calendar]
-    return {'message': 'Transaction amount by calendar calculated successfully', 'result': result}
 
 
 def get_txns():

@@ -34,10 +34,9 @@ api_blueprint.route('/rule/update/apply-txns/<int:rule_id>', methods=['PUT'])(ru
 api_blueprint.route('/config/update/<int:config_id>', methods=['PUT'])(config_view.update_config)
 api_blueprint.route('/config/get/<int:config_id>', methods=['GET'])(config_view.get_config)
 
-api_blueprint.route('/analysis/count', methods=['POST'])(analysis_view.get_count)
-api_blueprint.route('/analysis/amount', methods=['POST'])(analysis_view.get_amount)
+api_blueprint.route('/analysis/count/<int:date_range_count>', methods=['POST'])(analysis_view.get_count)
+api_blueprint.route('/analysis/amount/<int:date_range_count>', methods=['POST'])(analysis_view.get_amount)
 api_blueprint.route('/analysis/txns-by-amount-rank', methods=['POST'])(analysis_view.get_txns_by_amount_rank)
 api_blueprint.route('/analysis/amount-by-type', methods=['POST'])(analysis_view.get_amount_by_type)
 api_blueprint.route('/analysis/count-by-time', methods=['POST'])(analysis_view.get_count_by_time)
 api_blueprint.route('/analysis/amount-by-date', methods=['POST'])(analysis_view.get_amount_by_date)
-api_blueprint.route('/analysis/amount-by-calendar', methods=['POST'])(analysis_view.get_amount_by_calendar)
