@@ -1,6 +1,6 @@
 # money-minder-server\services\txn_service.py
 
-from sqlalchemy import and_, update, func, Integer
+from sqlalchemy import and_, update, func, Integer, desc
 
 from models import db
 from models.txn import Txn
@@ -218,7 +218,7 @@ def get_amount_by_date(start_date, end_date, inc_or_exp):
 
 
 def get_txns():
-    txns = Txn.query.all()
+    txns = Txn.query.order_by(desc(Txn.txn_date_time)).all()
     result = [{
         'txnId': txn.txn_id,
         'txnDateTime': txn.txn_date_time,
