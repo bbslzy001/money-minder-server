@@ -2,7 +2,7 @@
 
 import os
 
-from flask import Flask
+from flask import Flask, render_template
 from flask_cors import CORS
 # from waitress import serve
 
@@ -41,6 +41,16 @@ def create_app():
     # 创建上传文件夹
     if not os.path.exists(upload_view.UPLOAD_FOLDER):
         os.makedirs(upload_view.UPLOAD_FOLDER)
+
+    # 当Vue项目使用History模式时，刷新非根目录下的页面会发生404
+    # 该问题是由于刷新页面时，浏览器向服务器请求该地址，但服务器上并没有对应路由造成的
+    # 通过为Flask服务器配置"catch-all"路由，来匹配所有没有被其他路由匹配的URL，并返回index.html页面
+    # 返回index.html页面后，Vue路由会在前端接管，根据URL渲染正确的组件
+    # 注意：当Vue无法处理该URL时，仍然会显示空白页面或404页面
+    @app.route('/', defaults={'path': ''})
+    @app.route('/<path:path>')
+    def catch_all(path):
+        return render_template("index.html")
 
     return app
 
