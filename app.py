@@ -18,7 +18,8 @@ def create_app():
     app = Flask(__name__)
 
     # 加载配置
-    environment = os.environ.get('FLASK_ENV', 'development')  # 默认为开发环境
+    # environment = os.environ.get('FLASK_ENV', 'development')  # 默认为开发环境
+    environment = os.environ.get('FLASK_ENV', 'production')  # 默认为开发环境
     app.config.from_pyfile(f'settings/{environment}.py')
 
     # 根据配置决定是否启用跨域功能
@@ -58,6 +59,5 @@ def create_app():
 # 启动Flask
 if __name__ == '__main__':
     my_app = create_app()
-    my_app.run()
-
-    # serve(my_app, host='127.0.0.1', port=5000)
+    # my_app.run()
+    my_app.run(host='0.0.0.0', port=5000)  # 指定主机和端口（0.0.0.0表示所有可用的网络接口）
